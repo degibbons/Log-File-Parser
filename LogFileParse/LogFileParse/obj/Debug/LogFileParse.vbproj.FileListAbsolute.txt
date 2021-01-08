@@ -2,7 +2,7 @@ C:\Users\daneg\source\repos\LogFileParse\LogFileParse\bin\Debug\LogFileParse.exe
 C:\Users\daneg\source\repos\LogFileParse\LogFileParse\bin\Debug\LogFileParse.exe
 C:\Users\daneg\source\repos\LogFileParse\LogFileParse\bin\Debug\LogFileParse.pdb
 C:\Users\daneg\source\repos\LogFileParse\LogFileParse\bin\Debug\LogFileParse.xml
-C:\Users\daneg\source\repos\LogFileParse\LogFileParse\obj\Debug\LogFileParse.vbprojAssemblyReference.cache
+C:\Users\daneg\source\repos\LogFileParse\LogFileParse\obj\Debug\LogFileParse.vbproj.ResolveComReference.cache
 C:\Users\daneg\source\repos\LogFileParse\LogFileParse\obj\Debug\LogFileParse.Form1.resources
 C:\Users\daneg\source\repos\LogFileParse\LogFileParse\obj\Debug\LogFileParse.Resources.resources
 C:\Users\daneg\source\repos\LogFileParse\LogFileParse\obj\Debug\LogFileParse.vbproj.GenerateResource.cache
@@ -10,4 +10,3 @@ C:\Users\daneg\source\repos\LogFileParse\LogFileParse\obj\Debug\LogFileParse.vbp
 C:\Users\daneg\source\repos\LogFileParse\LogFileParse\obj\Debug\LogFileParse.exe
 C:\Users\daneg\source\repos\LogFileParse\LogFileParse\obj\Debug\LogFileParse.xml
 C:\Users\daneg\source\repos\LogFileParse\LogFileParse\obj\Debug\LogFileParse.pdb
-C:\Users\daneg\source\repos\LogFileParse\LogFileParse\obj\Debug\LogFileParse.vbproj.ResolveComReference.cache
