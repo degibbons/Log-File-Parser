@@ -1,12 +1,13 @@
+"""Creates a GUI for parsing out meta log data for recording from Bruker Skyscan 1173 log files."""
+
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog as fdlg
 import re
 from pathlib import Path
+import shutil
 import openpyxl
 from openpyxl.utils import get_column_letter
-import shutil
-
 
 
 class MainWindow(tk.Tk):
@@ -22,18 +23,6 @@ class MainWindow(tk.Tk):
         self.log_file_text = ""
         self.data_dict = {}
 
-        # pinkStyle = ttk.Style()
-        # pinkStyle.configure("test0Style.TFrame", background="pink")
-        # greenStyle = ttk.Style()
-        # greenStyle.configure("test1Style.TFrame", background="purple")
-        # blueStyle = ttk.Style()
-        # blueStyle.configure("test2Style.TFrame", background="orange")
-        # purpleStyle = ttk.Style()
-        # purpleStyle.configure("test3Style.TFrame", background="brown")
-
-        # self.rowconfigure(0, weight=1)
-        # self.columnconfigure(0, weight=1)
-
         # Title Frame
         title_frame = ttk.Frame(
             master=self,
@@ -41,23 +30,19 @@ class MainWindow(tk.Tk):
         )
         title_frame.grid(column=0, row=0, columnspan=1, rowspan=1, sticky=tk.W + tk.E)
         title_frame.columnconfigure(0, weight=1)
-        # title_frame.columnconfigure(4,weight=1)
-        # title_frame.rowconfigure(0,weight=1)
         self.main_title_label = ttk.Label(
             master=title_frame,
             text="Log File Parse Tool",
             relief=tk.FLAT,
             font=("Times New Roman", 18, "bold"),
-            #  background="yellow"
         )
         self.main_title_label.grid(
             row=0, column=0, columnspan=4, rowspan=1, ipadx=5, pady=0, sticky=tk.S
         )
         self.version_title_label = ttk.Label(
             master=title_frame,
-            text="v2.0.1",
+            text="v2.1.0",
             font=("Times New Roman", 8, "italic"),
-            # background="red"
         )
         self.version_title_label.grid(
             row=1, column=0, columnspan=4, rowspan=1, padx=0, pady=0, sticky=tk.N
@@ -75,7 +60,6 @@ class MainWindow(tk.Tk):
         # Start Frame
         start_frame = ttk.Frame(
             master=self,
-            # style='test0Style.TFrame'
         )
         start_frame.grid(
             column=0, row=1, columnspan=1, rowspan=1, padx=5, pady=5, sticky=tk.W + tk.E
@@ -92,14 +76,12 @@ class MainWindow(tk.Tk):
 
         self.select_destination_file_label_frame = ttk.LabelFrame(
             master=start_frame,
-            # labelwidget=self.select_destination_file_label,
             text="Destination File Name",
             height=2,
         )
         self.select_destination_file_label = ttk.Label(
             master=self.select_destination_file_label_frame,
             text="",
-            # background="red",
             width=130,
             anchor=tk.W,
         )
@@ -157,16 +139,13 @@ class MainWindow(tk.Tk):
         )
         self.select_log_file_label_frame = ttk.LabelFrame(
             master=start_frame,
-            # labelwidget=self.select_destination_file_label,
             text="Log File Name",
             height=2,
         )
         self.select_log_file_label = ttk.Label(
             master=self.select_log_file_label_frame,
             text="",
-            # background="green",
             width=130,
-            # height=2
         )
         self.select_log_file_label_frame.grid(
             row=1, column=1, columnspan=1, rowspan=1, padx=5, pady=5, sticky=tk.W + tk.E
@@ -190,7 +169,6 @@ class MainWindow(tk.Tk):
             rowspan=1,
             padx=5,
             pady=5,
-            # sticky=tk.E + tk.W,
         )
         self.indicator_light_importdata = tk.Canvas(
             master=start_frame, bg="white", height=50, width=100
@@ -212,16 +190,13 @@ class MainWindow(tk.Tk):
         )
         self.shift_log_file_label_frame = ttk.LabelFrame(
             master=start_frame,
-            # labelwidget=self.select_destination_file_label,
             text="Log File Destination",
             height=2,
         )
         self.shift_log_file_label = ttk.Label(
             master=self.shift_log_file_label_frame,
             text="",
-            # background="blue",
             width=130,
-            # height=2
         )
         self.shift_log_file_label_frame.grid(
             row=2, column=1, columnspan=1, rowspan=1, padx=5, pady=5, sticky=tk.W + tk.E
@@ -267,9 +242,7 @@ class MainWindow(tk.Tk):
         # Input Frame
         input_frame = ttk.Frame(
             master=self,
-            # style='test2Style.TFrame'
         )
-        # label_font=font(family="Times New Roman", size=9, weight="bold")
         input_frame.grid(
             column=0,
             row=2,
@@ -304,7 +277,7 @@ class MainWindow(tk.Tk):
         self.proposalnumber_textvar.set(value="Enter Here")
         self.name_label = ttk.Label(
             master=input_frame,
-            text="Name:",
+            text="PI and Collaborators",
             font=("Times New Roman", 9, "bold underline"),
         )
         self.name_label.grid(
@@ -343,39 +316,79 @@ class MainWindow(tk.Tk):
         self.position_label.grid(
             row=0, column=3, columnspan=1, rowspan=1, padx=5, pady=0, sticky=tk.W
         )
-        self.position_textvar = tk.StringVar()
-        self.position_input = ttk.Combobox(
-            master=input_frame,
-            textvariable=self.position_textvar,
-            values=(
-                "Faculty",
-                "Staff",
-                "Student",
-                "Other",
-                "Faculty/Staff",
-                "Faculty/Student",
-                "Faculty/Other",
-                "Staff/Student",
-                "Staff/Other",
-                "Student/Other",
-                "Faculty/Staff/Student",
-                "Faculty/Staff/Other",
-                "Faculty/Student/Other",
-                "Staff/Student/Other",
-                "Faculty/Staff/Student/Other",
-            ),
+
+        checkbox_frame = tk.Frame(master=input_frame)
+        checkbox_frame.grid(
+            row=1,
+            column=3,
+            columnspan=1,
+            rowspan=1,
+            padx=2,
+            pady=5,
+            sticky=tk.W + tk.E,
         )
-        # self.position_input = ttk.Entry(
-        #     master=input_frame, textvariable=self.position_textvar, width=35
-        # )
-        self.position_input.grid(
-            row=1, column=3, columnspan=1, rowspan=1, padx=2, pady=5, sticky=tk.W + tk.E
+
+        self.facultypos_intvar = tk.IntVar()
+        self.staffpos_intvar = tk.IntVar()
+        self.studentpos_intvar = tk.IntVar()
+        self.otherpos_intvar = tk.IntVar()
+        self.facultypos_input = ttk.Checkbutton(
+            master=checkbox_frame,
+            text="Faculty",
+            onvalue=1,
+            offvalue=0,
+            variable=self.facultypos_intvar,
         )
-        self.position_textvar.set(value="Select Here")
+        self.staffpos_input = ttk.Checkbutton(
+            master=checkbox_frame,
+            text="Staff",
+            onvalue=1,
+            offvalue=0,
+            variable=self.staffpos_intvar,
+        )
+        self.studentpos_input = ttk.Checkbutton(
+            master=checkbox_frame,
+            text="Student",
+            onvalue=1,
+            offvalue=0,
+            variable=self.studentpos_intvar,
+        )
+        self.otherpos_input = ttk.Checkbutton(
+            master=checkbox_frame,
+            text="Other",
+            onvalue=1,
+            offvalue=0,
+            variable=self.otherpos_intvar,
+        )
+
+        self.facultypos_input.grid(
+            row=0,
+            column=0,
+            pady=2,
+            sticky="w",
+        )
+        self.staffpos_input.grid(
+            row=1,
+            column=0,
+            pady=2,
+            sticky="w",
+        )
+        self.studentpos_input.grid(
+            row=0,
+            column=1,
+            pady=2,
+            sticky="w",
+        )
+        self.otherpos_input.grid(
+            row=1,
+            column=1,
+            pady=2,
+            sticky="w",
+        )
 
         self.operator_label = ttk.Label(
             master=input_frame,
-            text="Operator:",
+            text="Operator (Who did the actual scan):",
             font=("Times New Roman", 9, "bold underline"),
         )
         self.operator_label.grid(
@@ -425,12 +438,11 @@ class MainWindow(tk.Tk):
             master=input_frame,
             textvariable=self.filename_textvar,
             width=35,
-            # background="red"
         )
         self.filename_input.grid(
             row=3, column=1, columnspan=1, rowspan=1, padx=5, pady=5, sticky=tk.W
         )
-        self.filename_textvar.set(value="Known")
+        self.filename_textvar.set(value="Auto Fill")
         self.voltage_label = ttk.Label(
             master=input_frame,
             text="Voltage:",
@@ -446,7 +458,7 @@ class MainWindow(tk.Tk):
         self.voltage_input.grid(
             row=3, column=2, columnspan=1, rowspan=1, padx=5, pady=5, sticky=tk.W
         )
-        self.voltage_textvar.set(value="Known")
+        self.voltage_textvar.set(value="Auto Fill")
         self.current_label = ttk.Label(
             master=input_frame,
             text="Current:",
@@ -462,7 +474,7 @@ class MainWindow(tk.Tk):
         self.current_input.grid(
             row=3, column=3, columnspan=1, rowspan=1, padx=5, pady=5, sticky=tk.W
         )
-        self.current_textvar.set(value="Known")
+        self.current_textvar.set(value="Auto Fill")
         self.resolution_label = ttk.Label(
             master=input_frame,
             text="Resolution:",
@@ -493,7 +505,13 @@ class MainWindow(tk.Tk):
         self.filter_combobox = ttk.Combobox(
             master=input_frame,
             textvariable=self.filter_textvar,
-            values=("Br 0.25 mm", "AL 1.0 mm", "None"),
+            values=(
+                "None",
+                "Br 0.25mm",
+                "Al 1.0mm",
+                "User Filter: Al 0.5mm",
+                "User Filter: ",
+            ),
         )
         self.filter_combobox.grid(
             row=5, column=0, columnspan=1, rowspan=1, padx=5, pady=5, sticky=tk.W
@@ -514,7 +532,7 @@ class MainWindow(tk.Tk):
         self.exposure_input.grid(
             row=5, column=1, columnspan=1, rowspan=1, padx=5, pady=5, sticky=tk.W
         )
-        self.exposure_textvar.set(value="Known")
+        self.exposure_textvar.set(value="Auto Fill")
         self.pixel_size_label = ttk.Label(
             master=input_frame,
             text="Pixel Size:",
@@ -530,7 +548,7 @@ class MainWindow(tk.Tk):
         self.pixel_size_input.grid(
             row=5, column=2, columnspan=1, rowspan=1, padx=5, pady=5, sticky=tk.W
         )
-        self.pixelsize_textvar.set(value="Known")
+        self.pixelsize_textvar.set(value="Auto Fill")
         self.image_format_label = ttk.Label(
             master=input_frame,
             text="Image Format:",
@@ -546,7 +564,7 @@ class MainWindow(tk.Tk):
         self.image_format_input.grid(
             row=5, column=3, columnspan=1, rowspan=1, padx=5, pady=5, sticky=tk.W
         )
-        self.imageformat_textvar.set(value="Known")
+        self.imageformat_textvar.set(value="Auto Fill")
         self.type_of_scan_label = ttk.Label(
             master=input_frame,
             text="Type of Scan:",
@@ -555,14 +573,39 @@ class MainWindow(tk.Tk):
         self.type_of_scan_label.grid(
             row=4, column=4, columnspan=1, rowspan=1, padx=5, pady=0, sticky=tk.W
         )
+
+        scantype_frame = tk.Frame(master=input_frame)
+        scantype_frame.grid(
+            row=5,
+            column=4,
+            columnspan=1,
+            rowspan=1,
+            padx=2,
+            pady=5,
+            sticky=tk.W + tk.E,
+        )
+
         self.typeofscan_textvar = tk.StringVar()
         self.type_of_scan_input = ttk.Entry(
-            master=input_frame, textvariable=self.typeofscan_textvar, width=35
+            master=scantype_frame, textvariable=self.typeofscan_textvar, width=35
         )
         self.type_of_scan_input.grid(
-            row=5, column=4, columnspan=1, rowspan=1, padx=5, pady=5, sticky=tk.W
+            row=0, column=0, columnspan=1, rowspan=1, padx=0, pady=0, sticky=tk.W
         )
         self.typeofscan_textvar.set(value="Enter Here")
+        self.offset_yesno = tk.IntVar()
+        self.offset_checkbutton = ttk.Checkbutton(
+            master=scantype_frame,
+            text="Offset?",
+            onvalue=1,
+            offvalue=0,
+            variable=self.offset_yesno,
+        )
+        self.offset_yesno.set(value=0)
+        self.offset_checkbutton.grid(
+            row=0, column=1, columnspan=1, rowspan=1, padx=5, pady=5, sticky=tk.E
+        )
+
         self.rotation_step_label = ttk.Label(
             master=input_frame,
             text="Rotation Step:",
@@ -578,7 +621,7 @@ class MainWindow(tk.Tk):
         self.rotation_step_input.grid(
             row=7, column=0, columnspan=1, rowspan=1, padx=5, pady=5, sticky=tk.W
         )
-        self.rotationstep_textvar.set(value="Known")
+        self.rotationstep_textvar.set(value="Auto Fill")
         self.frames_label = ttk.Label(
             master=input_frame,
             text="Frames:",
@@ -594,7 +637,7 @@ class MainWindow(tk.Tk):
         self.frames_input.grid(
             row=7, column=1, columnspan=1, rowspan=1, padx=5, pady=5, sticky=tk.W
         )
-        self.frames_textvar.set(value="Known")
+        self.frames_textvar.set(value="Auto Fill")
         self.random_movement_label = ttk.Label(
             master=input_frame,
             text="Random Movement:",
@@ -610,7 +653,7 @@ class MainWindow(tk.Tk):
         self.random_movement_input.grid(
             row=7, column=2, columnspan=1, rowspan=1, padx=5, pady=5, sticky=tk.W
         )
-        self.randommovement_textvar.set(value="Known")
+        self.randommovement_textvar.set(value="Auto Fill")
         self.rotate360_yesno = tk.IntVar()
         self.rotate_360_checkbutton = ttk.Checkbutton(
             master=input_frame,
@@ -638,7 +681,7 @@ class MainWindow(tk.Tk):
         self.scan_duration_input.grid(
             row=7, column=4, columnspan=1, rowspan=1, padx=5, pady=5, sticky=tk.W
         )
-        self.scanduration_textvar.set(value="Known")
+        self.scanduration_textvar.set(value="Auto Fill")
         self.comments_label = ttk.Label(
             master=input_frame,
             text="Comments:",
@@ -647,7 +690,6 @@ class MainWindow(tk.Tk):
         self.comments_label.grid(
             row=8, column=0, columnspan=1, rowspan=1, padx=5, pady=0, sticky=tk.W
         )
-        # self.comments_textvar = tk.StringVar()
         self.comments_input = tk.Text(
             master=input_frame,
             height=4,
@@ -657,7 +699,6 @@ class MainWindow(tk.Tk):
             row=9, column=0, columnspan=3, rowspan=1, padx=5, pady=5, sticky=tk.W
         )
         self.comments_input.insert(tk.END, "Enter Here")
-        # self.comments_textvar.set(value="Enter Here")
         self.logfilearchive_yesno = tk.IntVar()
         self.log_file_archived_checkbutton = ttk.Checkbutton(
             master=input_frame,
@@ -689,43 +730,11 @@ class MainWindow(tk.Tk):
         # Output Frame
         output_frame = ttk.Frame(
             master=self,
-            # style='test3Style.TFrame'
         )
         output_frame.grid(
             column=0, row=4, columnspan=1, rowspan=1, padx=5, pady=5, sticky=tk.E
         )
-        self.selectedfile_radbuttonvar = tk.IntVar()
-        self.excel_select_radiobutton = ttk.Radiobutton(
-            master=output_frame,
-            text="Excel File",
-            variable=self.selectedfile_radbuttonvar,
-            value=1,
-        )
-        self.gsheet_select_radiobutton = ttk.Radiobutton(
-            master=output_frame,
-            text="Google Sheet",
-            variable=self.selectedfile_radbuttonvar,
-            value=0,
-        )
-        self.selectedfile_radbuttonvar.set(1)
-        self.excel_select_radiobutton.grid(
-            row=0,
-            column=0,
-            columnspan=1,
-            rowspan=2,
-            padx=5,
-            pady=5,
-            sticky=tk.W,
-        )
-        self.gsheet_select_radiobutton.grid(
-            row=2,
-            column=0,
-            columnspan=1,
-            rowspan=2,
-            padx=5,
-            pady=5,
-            sticky=tk.W,
-        )
+
         self.publish_info_button = ttk.Button(
             master=output_frame, text="Publish Info", command=self.publish_info
         )
@@ -750,7 +759,7 @@ class MainWindow(tk.Tk):
         self.hb_object_box.title(
             "Help Box Window"
         )  # Set the title of the help box window
-        frame_12 = ttk.Frame(
+        _ = ttk.Frame(
             master=self.hb_object_box
         )  # Create a frame to hold the page change buttons
         help_notebook = ttk.Notebook(master=self.hb_object_box)
@@ -868,12 +877,9 @@ class MainWindow(tk.Tk):
             master=help_frame_6,
             text="""
 
-            Google Sheets functionality is only designated for  use by the lab operator, and should not be used otherwise. Proper access
-            authentication is required for use and will not be operational otherwise.
-
             For input fields, most input should be self explanatory with specifics laid out below:
             - Proposal # -> should be established beforehand, known to the users before scanning
-            - Name -> The names of each person associated with the project the scan is linked with
+            - PI and Collaborators -> The names of each person associated with the project the scan is linked with
             - Date -> The date of the scan
             - Position -> The position(s) of the users from the aforementioned Names list
             - Operator -> The specific person who operated the machine for the designated scan
@@ -912,7 +918,6 @@ class MainWindow(tk.Tk):
                 self.import_data_light, fill="green"
             )
             self.target_archive_file = selected_destination_file
-        # print(selected_destination_file)
 
     def select_log_source_file(self):
         """opens a file dialog asking the user to select a log file
@@ -923,7 +928,6 @@ class MainWindow(tk.Tk):
             self.indicator_light_importdata.itemconfig(
                 self.import_data_light, fill="yellow"
             )
-        # print(selected_log_source_file)
 
     def parse_data(self):
         """parses through the data extracted from the log file, filling all
@@ -957,11 +961,14 @@ class MainWindow(tk.Tk):
         log_resolution = re.compile(r"Number of Rows\s*=\s*(\d+)", re.I)
         log_exposure = re.compile(r"Exposure \(ms\)\s*=\s*(\d+)", re.I)
         log_pixelsize = re.compile(r"Image Pixel Size\s*\(um\)\s*=(\d+\.\d+)", re.I)
+        log_filter = re.compile(r"Filter\s*=\s*(.*)")
         log_imageformat = re.compile(r"Image Format\s*=\s*(\w+)", re.I)
+        log_typeofscan = re.compile(r"Number of connected scans\s*=\s*(\d+)", re.I)
+        log_offset = re.compile(r"Camera Offset\s*=\s*(ON|OFF)", re.I)
         log_rotationstep = re.compile(r"Rotation Step\s*\(deg\)\s*=\s*(\d+\.\d+)", re.I)
-        log_frames = re.compile(r"Frame Averaging\s*=[ON|OFF]{2,3}\s*\((\d+)\)", re.I)
+        log_frames = re.compile(r"Frame Averaging\s*=(ON|OFF)\s*\((\d+)\)", re.I)
         log_randommovement = re.compile(
-            r"Random Movement\s*=[ON|OFF]{2,3}\s*\((\d+)\)", re.I
+            r"Random Movement\s*=(ON|OFF)\s*\((\d+)\)", re.I
         )
         log_360 = re.compile(r"Use 360 Rotation\s*=\s*(\w+)", re.I)
         log_scanduration = re.compile(r"Scan duration\s*=\s*(\d{2}:\d{2}:\d{2})", re.I)
@@ -969,7 +976,6 @@ class MainWindow(tk.Tk):
         try:
             date_find = log_date.search(str(self.log_file_text))
             if date_find is not None:
-                # print("Date found")
                 self.date_textvar.set(
                     str(month_dict[str(date_find.group(1))])
                     + "/"
@@ -977,9 +983,7 @@ class MainWindow(tk.Tk):
                     + "/"
                     + str(date_find.group(3))
                 )
-                # print(str(date_find.group(2)))
             else:
-                # print("Date not found???")
                 pass
         except Exception:
             date_find = None
@@ -1023,6 +1027,22 @@ class MainWindow(tk.Tk):
             resolution_find = None
             print("Resolution not found. Fix and try again.")
         try:
+            filter_find = log_filter.search(str(self.log_file_text))
+            if filter_find is not None:
+                if filter_find.group(1) == "Al 1.0mm":
+                    self.filter_textvar.set("Al 1.0mm")
+                elif filter_find.group(1) == "brass 0.25mm":
+                    self.filter_textvar.set("Br 0.25mm")
+                elif filter_find.group(1) == "No Filter":
+                    self.filter_textvar.set("None")
+                elif filter_find.group(1) == "User filter":
+                    self.filter_textvar.set("User Filter: Al 0.5mm")
+                else:
+                    self.filter_textvar.set("User Filter: ")
+        except Exception:
+            filter_find = None
+            print("Filter not found. Fix and try again.")
+        try:
             exposure_find = log_exposure.search(str(self.log_file_text))
             if exposure_find is not None:
                 self.exposure_textvar.set(str(exposure_find.group(1)))
@@ -1044,6 +1064,32 @@ class MainWindow(tk.Tk):
             imageformat_find = None
             print("Image Format not found. Fix and try again.")
         try:
+            typeofscan_find = log_typeofscan.search(str(self.log_file_text))
+            if typeofscan_find is not None:
+                temp_type = str(typeofscan_find.group(1))
+                act_typeofscan = None
+                if int(temp_type) == 1:
+                    act_typeofscan = "Regular"
+                elif int(temp_type) > 1:
+                    act_typeofscan = f"Oversize ({temp_type})"
+                else:
+                    act_typeofscan = "N/a"
+                self.typeofscan_textvar.set(act_typeofscan)
+        except Exception:
+            typeofscan_find = None
+            print("Type of Scan not found. Fix and try again.")
+        try:
+            offset_find = log_offset.search(str(self.log_file_text))
+            if offset_find is not None:
+                temp_offset = str(offset_find.group(1))
+                if temp_offset == "ON":
+                    self.offset_yesno.set(1)
+                else:
+                    self.offset_yesno.set(0)
+        except Exception:
+            log_offset = None
+            print("Offset not found. Fix and try again.")
+        try:
             rotationstep_find = log_rotationstep.search(str(self.log_file_text))
             if rotationstep_find is not None:
                 self.rotationstep_textvar.set(str(rotationstep_find.group(1)))
@@ -1053,23 +1099,30 @@ class MainWindow(tk.Tk):
         try:
             frames_find = log_frames.search(str(self.log_file_text))
             if frames_find is not None:
-                self.frames_textvar.set(str(frames_find.group(1)))
+                if str(frames_find.group(1)) == "OFF":
+                    self.frames_textvar.set("OFF")
+                else:
+                    self.frames_textvar.set(str(frames_find.group(2)))
         except Exception:
             frames_find = None
             print("Frames not found. Fix and try again.")
         try:
             randommovement_find = log_randommovement.search(str(self.log_file_text))
             if randommovement_find is not None:
-                self.randommovement_textvar.set(str(randommovement_find.group(1)))
+                if str(randommovement_find.group(1)) == "OFF":
+                    self.randommovement_textvar.set("OFF")
+                else:
+                    self.randommovement_textvar.set(str(randommovement_find.group(2)))
         except Exception:
             randommovement_find = None
             print("Random Movement not found. Fix and try again.")
         try:
             move360_find = log_360.search(str(self.log_file_text))
-            if str(move360_find).capitalize() == "YES":
-                self.rotate360_yesno.set(True)
-            else:
-                self.rotate360_yesno.set(False)
+            if move360_find is not None:
+                if str(move360_find.group(1)).upper() == "YES":
+                    self.rotate360_yesno.set(1)
+                else:
+                    self.rotate360_yesno.set(0)
         except Exception:
             move360_find = None
             print("360 Movement not found. Fix and try again.")
@@ -1097,7 +1150,26 @@ class MainWindow(tk.Tk):
         self.data_dict["Proposal Number"] = self.proposalnumber_textvar.get()
         self.data_dict["Name"] = self.name_textvar.get()
         self.data_dict["Date"] = self.date_textvar.get()
-        self.data_dict["Position"] = self.position_textvar.get()
+        facultyselected = self.facultypos_intvar.get()
+        staffselected = self.staffpos_intvar.get()
+        studentselected = self.studentpos_intvar.get()
+        otherselected = self.otherpos_intvar.get()
+        self.data_dict["Position"] = ""
+        if facultyselected == 1:
+            self.data_dict["Position"] = self.data_dict["Position"] + "Faculty"
+        if staffselected == 1:
+            if len(self.data_dict["Position"]) > 0:
+                self.data_dict["Position"] = self.data_dict["Position"] + "/"
+            self.data_dict["Position"] = self.data_dict["Position"] + "Staff"
+        if studentselected == 1:
+            if len(self.data_dict["Position"]) > 0:
+                self.data_dict["Position"] = self.data_dict["Position"] + "/"
+            self.data_dict["Position"] = self.data_dict["Position"] + "Student"
+        if otherselected == 1:
+            if len(self.data_dict["Position"]) > 0:
+                self.data_dict["Position"] = self.data_dict["Position"] + "/"
+            self.data_dict["Position"] = self.data_dict["Position"] + "Other"
+
         self.data_dict["Operator"] = self.operator_textvar.get()
         self.data_dict["NYIT or External"] = self.nyitorext_textvar.get()
         self.data_dict["Filename"] = self.filename_textvar.get()
@@ -1122,6 +1194,8 @@ class MainWindow(tk.Tk):
         self.data_dict["Pixel Size"] = self.pixelsize_textvar.get()
         self.data_dict["Image Format"] = self.imageformat_textvar.get()
         self.data_dict["Type of Scan"] = self.typeofscan_textvar.get()
+        if self.offset_yesno.get() == 1:
+            self.data_dict["Type of Scan"] = self.data_dict["Type of Scan"] + "; Offset"
         self.data_dict["Rotation Step"] = self.rotationstep_textvar.get()
         self.data_dict["Frames"] = self.frames_textvar.get()
         self.data_dict["Random Movement"] = self.randommovement_textvar.get()
@@ -1133,6 +1207,8 @@ class MainWindow(tk.Tk):
         self.data_dict["Comments"] = self.comments_input.get(
             "1.0", "end-1c"
         )  # Deletes the newline character that's added with getting the input
+        if self.data_dict["Comments"] == "Enter Here":
+            self.data_dict["Comments"] = ""
         if self.logfilearchive_yesno.get() == 1:
             self.data_dict["Log File Archived"] = "yes"
         else:
@@ -1170,24 +1246,21 @@ class MainWindow(tk.Tk):
         #     np.array([appendable_data]),
         # )
 
-        if self.selectedfile_radbuttonvar.get() == 1:  # Excel
-            # Check if target excel sheet is selected
-            myxlfile = Path(self.target_archive_file)
-            wb = openpyxl.load_workbook(myxlfile)
-            sheet = wb[wb.sheetnames[0]]
-            sheetmaxrow = sheet.max_row + 1
-            for i in range(sheet.max_column):
-                column_let = get_column_letter(i + 1)
-                cell2edit = str(column_let) + str(sheetmaxrow)
-                if 0 <= i < len(appendable_data):
-                    sheet[cell2edit] = appendable_data[i]
-            wb.save(myxlfile)
+        # Check if target excel sheet is selected
+        myxlfile = Path(self.target_archive_file)
+        wb = openpyxl.load_workbook(myxlfile)
+        sheet = wb[wb.sheetnames[0]]
+        sheetmaxrow = sheet.max_row + 1
+        for i in range(sheet.max_column):
+            column_let = get_column_letter(i + 1)
+            cell2edit = str(column_let) + str(sheetmaxrow)
+            if 0 <= i < len(appendable_data):
+                sheet[cell2edit] = appendable_data[i]
+        wb.save(myxlfile)
 
-            # Move file after publishing data
-            if str(self.selected_log_source_file) != "":
-                shutil.copy(str(self.selected_log_source_file), str(self.target_dir))
-        else:  # Google Sheets
-            pass
+        # Move file after publishing data
+        if str(self.selected_log_source_file) != "":
+            shutil.copy(str(self.selected_log_source_file), str(self.target_dir))
 
     def reset_clear(self):
         """clear all user input and reset all fields for re-filling"""
@@ -1212,24 +1285,28 @@ class MainWindow(tk.Tk):
 
         self.proposalnumber_textvar.set("Enter Here")
         self.name_textvar.set("Enter Here")
-        self.date_textvar.set("Known")
-        self.position_textvar.set("Enter Here")
+        self.date_textvar.set("Auto Fill")
+        self.facultypos_intvar.set(0)
+        self.staffpos_intvar.set(0)
+        self.studentpos_intvar.set(0)
+        self.otherpos_intvar.set(0)
         self.operator_textvar.set("Enter Here")
         self.nyitorext_textvar.set("Enter Here")
-        self.filename_textvar.set("Known")
-        self.voltage_textvar.set("Known")
-        self.current_textvar.set("Known")
+        self.filename_textvar.set("Auto Fill")
+        self.voltage_textvar.set("Auto Fill")
+        self.current_textvar.set("Auto Fill")
         self.resolution_textvar.set("Click to Select")
         self.filter_textvar.set("Enter or Select Here")
-        self.exposure_textvar.set("Known")
-        self.pixelsize_textvar.set("Known")
-        self.imageformat_textvar.set("Known")
+        self.exposure_textvar.set("Auto Fill")
+        self.pixelsize_textvar.set("Auto Fill")
+        self.imageformat_textvar.set("Auto Fill")
         self.typeofscan_textvar.set("Enter Here")
-        self.rotationstep_textvar.set("Known")
-        self.frames_textvar.set("Known")
-        self.randommovement_textvar.set("Known")
+        self.offset_yesno.set(0)
+        self.rotationstep_textvar.set("Auto Fill")
+        self.frames_textvar.set("Auto Fill")
+        self.randommovement_textvar.set("Auto Fill")
         self.rotate360_yesno.set(0)
-        self.scanduration_textvar.set("Known")
+        self.scanduration_textvar.set("Auto Fill")
         self.comments_input.delete(1.0, tk.END)
         self.comments_input.insert(tk.END, "Enter Here")
         self.logfilearchive_yesno.set(0)
